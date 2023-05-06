@@ -7,7 +7,7 @@ using System.Windows.Forms;
 
 namespace ContextRecord.Class
 {
-    internal class EdgeBrowserContext: IContext
+    internal class EdgeBrowserContext: Context
     {
         [DllImport("User32.dll")]
         static extern int SetForegroundWindow(IntPtr point);

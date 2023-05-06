@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ContextRecord.Class;
+using System;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
@@ -11,6 +12,7 @@ namespace ContextRecord
     {
         static void Main(string[] args)
         {
+            var edgeBrowserContext = new EdgeBrowserContext();
         }
 
         
