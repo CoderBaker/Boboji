@@ -12,7 +12,7 @@ namespace ContextRecord.Class
         /// <summary>
         /// Path of the file that used to store the context
         /// </summary>
-        protected string recordFilePath = "";
+        public string recordFilePath = "";
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Context"/> class.
@@ -26,7 +26,6 @@ namespace ContextRecord.Class
         /// <summary>
         /// Get and write the context into the file
         /// </summary>
-        /// <returns></returns>
         public virtual void GetContext()
         {
             return ;

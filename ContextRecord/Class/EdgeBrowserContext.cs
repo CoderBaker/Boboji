@@ -19,6 +19,37 @@ namespace ContextRecord.Class
         [return: MarshalAs(UnmanagedType.Bool)]
         static extern bool GetWindowPlacement(IntPtr hWnd, ref Windowplacement lpwndpl);
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="EdgeBrowserContext"/> class.
+        /// </summary>
+        /// <param name="recordFilePath">record file path</param>
+        public EdgeBrowserContext(string recordFilePath) : base(recordFilePath)
+        {
+        }
+
+        /// <summary>
+        /// Get and write the context into the file
+        /// </summary>
+        /// <returns></returns>
+        public override void GetContext()
+        {
+            /// TBD
+            this.switchTab();
+            return;
+        }
+
+        /// <summary>
+        /// Write the record into file
+        /// </summary>
+        protected override void WriteContext()
+        {
+            /// TBD
+            return;
+        }
+
+        /// <summary>
+        /// Switch the tab in edge and record the url
+        /// </summary>
         private void switchTab()
         {
             Process[] procsEdge = System.Diagnostics.Process.GetProcessesByName("msedge");
@@ -59,6 +90,9 @@ namespace ContextRecord.Class
             }
         }
 
+        /// <summary>
+        /// Not sure why we need this
+        /// </summary>
         private struct Windowplacement
         {
             public int length;
