@@ -3,7 +3,7 @@
     /// <summary>
     /// The context data of edge browser.
     /// </summary>
-    public class EdgeBrowserContextData
+    public record EdgeBrowserContextData
     {
     }
 }
