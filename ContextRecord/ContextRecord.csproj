@@ -61,15 +61,18 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ContextDataStructures\EdgeBrowserContextData.cs" />
+    <Compile Include="ContextSerializers\ContextSerializer.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Interface\IContext.cs" />
-    <Compile Include="Class\Context.cs" />
-    <Compile Include="Class\EdgeBrowserContext.cs" />
+    <Compile Include="Contexts\Context.cs" />
+    <Compile Include="Contexts\EdgeBrowserContext.cs" />
+    <Compile Include="Win32ApiUtils\User32.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
