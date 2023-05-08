@@ -12,7 +12,8 @@ namespace ContextRecord
     {
         static void Main(string[] args)
         {
-            var edgeBrowserContext = new EdgeBrowserContext();
+            var edgeBrowserContext = new EdgeBrowserContext("");
+            edgeBrowserContext.GetContext();
         }
 
         
