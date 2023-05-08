@@ -1,4 +1,6 @@
-﻿using ContextRecord.Contexts;
+﻿using System;
+using System.Linq;
+using ContextRecord.Contexts;
 
 namespace ContextRecord
 {
@@ -7,7 +9,8 @@ namespace ContextRecord
         static void Main(string[] args)
         {
             var edgeBrowserContext = new EdgeBrowserContext();
-            edgeBrowserContext.GetContext();
+            var context = edgeBrowserContext.GetContext();
+            Console.WriteLine(string.Join(Environment.NewLine, context.Select(x => $"Title: {x.Title} URL: {x.URL}")));
         }        
     }
 }

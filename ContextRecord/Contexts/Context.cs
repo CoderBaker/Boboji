@@ -1,5 +1,7 @@
 ﻿namespace ContextRecord.Contexts
 {
+    using System.Collections.Generic;
+
     /// <summary>
     /// The software context.
     /// </summary>
@@ -10,12 +12,12 @@
         /// Get and write the context into the file
         /// </summary>
         /// <returns>The context data.</returns>
-        public abstract T GetContext();
+        public abstract IEnumerable<T> GetContext();
 
         /// <summary>
         /// Loads context from the context data.
         /// </summary>
         /// <param name="contextData">The context data.</param>
-        public abstract void LoadContext(T contextData);
+        public abstract void LoadContext(IEnumerable<T> contextData);
     }
 }

@@ -1,7 +1,9 @@
 ﻿namespace ContextRecord.Contexts
 {
     using System;
+    using System.Collections.Generic;
     using System.Diagnostics;
+    using System.Linq;
     using System.Windows.Automation;
     using System.Windows.Forms;
     using ContextRecord.ContextDataStructures;
@@ -15,27 +17,27 @@
         private const string EdgeProcessName = "msedge";
 
         /// <inheritdoc/>
-        public override EdgeBrowserContextData GetContext()
+        public override IEnumerable<EdgeBrowserContextData> GetContext()
         {
             /// TBD
-            this.SwitchTab();
-            return new EdgeBrowserContextData();
+            return GetTabsAndURLs().Select(pair => new EdgeBrowserContextData() { Title = pair.Item1, URL = pair.Item2 }).ToList();
         }
 
         /// <inheritdoc/>
-        public override void LoadContext(EdgeBrowserContextData contextData)
+        public override void LoadContext(IEnumerable<EdgeBrowserContextData> contextData)
         {
             throw new NotImplementedException();
         }
 
         /// <summary>
-        /// Switch the tab in edge and record the url
+        /// Gets tab titles and URLs of Edge browser.
         /// </summary>
-        private void SwitchTab()
+        /// <returns>A collection of tab titles and URLs.</returns>
+        private static IEnumerable<(string, string)> GetTabsAndURLs()
         {
-            Process[] procsEdge = Process.GetProcessesByName(EdgeProcessName);
+            var procsEdge = Process.GetProcessesByName(EdgeProcessName);
 
-            foreach (Process proc in procsEdge)
+            foreach (var proc in procsEdge)
             {
                 var windowPlacement = new User32.WindowPlacement();
                 User32.ApiGetWindowPlacement(proc.MainWindowHandle, ref windowPlacement);
@@ -50,22 +52,20 @@
                 User32.ApiSetForegroundWindow(proc.MainWindowHandle);
                 SendKeys.SendWait("^1");
                 if (proc.MainWindowHandle == IntPtr.Zero)
-                    continue;
-
-                int numTabs = procsEdge.Length;
-                int index = 1;
-                //loop all tabs in Edge
-                while (index <= numTabs)
                 {
-                    //get the url of tab
-                    var root = AutomationElement.FromHandle(proc.MainWindowHandle);
+                    continue;
+                }
+
+                var root = AutomationElement.FromHandle(proc.MainWindowHandle);
+                foreach (var tabItem in root.FindAll(TreeScope.Subtree, new PropertyCondition(AutomationElement.ControlTypeProperty, ControlType.TabItem)).Cast<AutomationElement>())
+                {
                     var SearchBar = root.FindFirst(TreeScope.Descendants, new PropertyCondition(AutomationElement.NameProperty, "Address and search bar"));
-                    if (SearchBar != null)
-                    {
-                        string str = (string)SearchBar.GetCurrentPropertyValue(ValuePatternIdentifiers.ValueProperty);
-                        Console.WriteLine(str);
-                    }
-                    index++;
+                    
+                    var title = tabItem.Current.Name;
+                    var url = (string)SearchBar.GetCurrentPropertyValue(ValuePatternIdentifiers.ValueProperty);
+                    yield return (title, url);
+
+                    User32.ApiSetForegroundWindow(proc.MainWindowHandle);
                     SendKeys.SendWait("^{TAB}"); // change focus to next tab
                 }
             }
