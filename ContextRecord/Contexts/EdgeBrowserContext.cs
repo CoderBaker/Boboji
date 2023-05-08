@@ -9,7 +9,7 @@
     using ContextRecord.ContextDataStructures;
     using ContextRecord.Win32ApiUtils;
 
-    internal class EdgeBrowserContext : Context<EdgeBrowserContextData>
+    internal class EdgeBrowserContext : Context<IEnumerable<EdgeBrowserContextData>>
     {
         /// <summary>
         /// The process name of Edge.
