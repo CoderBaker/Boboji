@@ -1,7 +1,5 @@
 ﻿namespace ContextRecord.Contexts
 {
-    using System.Collections.Generic;
-
     /// <summary>
     /// The software context.
     /// </summary>
@@ -9,15 +7,37 @@
     public abstract class Context<T>
     {
         /// <summary>
-        /// Get and write the context into the file
+        /// The context cache;
+        /// </summary>
+        protected T? ContextCache { get; set; }
+
+        /// <summary>
+        /// Gets the context data and caches it.
         /// </summary>
         /// <returns>The context data.</returns>
-        public abstract T GetContext();
+        public virtual T GetContext()
+        {
+            this.ContextCache ??= this.GenerateNewContext();
+            return this.ContextCache;
+        }
 
         /// <summary>
         /// Loads context from the context data.
         /// </summary>
         /// <param name="contextData">The context data.</param>
-        public abstract void LoadContext(T contextData);
+        public virtual void LoadContext(T contextData)
+        {
+            this.ContextCache = contextData;
+        }
+
+        /// <summary>
+        /// Recovers context based on the context data cached.
+        /// </summary>
+        public abstract void RecoverContext();
+
+        /// <summary>
+        /// Generates a new context.
+        /// </summary>
+        protected abstract T GenerateNewContext();
     }
 }

@@ -17,16 +17,16 @@
         private const string EdgeProcessName = "msedge";
 
         /// <inheritdoc/>
-        public override IEnumerable<EdgeBrowserContextData> GetContext()
+        public override void RecoverContext()
         {
-            /// TBD
-            return GetTabsAndURLs().Select(pair => new EdgeBrowserContextData() { Title = pair.Item1, URL = pair.Item2 }).ToList();
+            throw new NotImplementedException();
         }
 
         /// <inheritdoc/>
-        public override void LoadContext(IEnumerable<EdgeBrowserContextData> contextData)
+        protected override IEnumerable<EdgeBrowserContextData> GenerateNewContext()
         {
-            throw new NotImplementedException();
+            /// TBD
+            return GetTabsAndURLs().Select(pair => new EdgeBrowserContextData() { Title = pair.Item1, URL = pair.Item2 }).ToList();
         }
 
         /// <summary>
@@ -60,7 +60,7 @@
                 foreach (var tabItem in root.FindAll(TreeScope.Subtree, new PropertyCondition(AutomationElement.ControlTypeProperty, ControlType.TabItem)).Cast<AutomationElement>())
                 {
                     var SearchBar = root.FindFirst(TreeScope.Descendants, new PropertyCondition(AutomationElement.NameProperty, "Address and search bar"));
-                    
+
                     var title = tabItem.Current.Name;
                     var url = (string)SearchBar.GetCurrentPropertyValue(ValuePatternIdentifiers.ValueProperty);
                     yield return (title, url);
