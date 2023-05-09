@@ -1,5 +1,7 @@
 ﻿namespace ContextRecord.ContextDataStructures
 {
+    using System.Text.Json.Serialization;
+
     /// <summary>
     /// The context data of edge browser.
     /// </summary>

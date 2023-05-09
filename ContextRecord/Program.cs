@@ -1,6 +1,7 @@
-﻿using System;
-using System.Linq;
+﻿using System.Collections.Generic;
+using ContextRecord.ContextDataStructures;
 using ContextRecord.Contexts;
+using ContextRecord.ContextSerializers;
 
 namespace ContextRecord
 {
@@ -8,9 +9,9 @@ namespace ContextRecord
     {
         static void Main(string[] args)
         {
-            var edgeBrowserContext = new EdgeBrowserContext();
-            var context = edgeBrowserContext.GetContext();
-            Console.WriteLine(string.Join(Environment.NewLine, context.Select(x => $"Title: {x.Title} URL: {x.URL}")));
+            var edgeBrowserContext = new EdgeBrowserContext(new JsonContextSerializer<IEnumerable<EdgeBrowserContextData>>("edge_context.json"));
+            edgeBrowserContext.GetContext();
+            edgeBrowserContext.SaveContext();
         }        
     }
 }

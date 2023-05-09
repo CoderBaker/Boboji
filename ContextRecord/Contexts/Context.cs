@@ -1,11 +1,20 @@
 ﻿namespace ContextRecord.Contexts
 {
+    using ContextRecord.ContextSerializers;
+
     /// <summary>
     /// The software context.
     /// </summary>
     /// <typeparam name="T">The type of the context data.</typeparam>
     public abstract class Context<T>
     {
+        private readonly IContextSerializer<T> serializer;
+
+        protected Context(IContextSerializer<T> serializer)
+        {
+            this.serializer = serializer;
+        }
+
         /// <summary>
         /// The context cache;
         /// </summary>
@@ -22,12 +31,28 @@
         }
 
         /// <summary>
+        /// Loads context from the storage.
+        /// </summary>
+        public virtual void LoadContext()
+        {
+            this.ContextCache = this.serializer.LoadContextData();
+        }
+
+        /// <summary>
         /// Loads context from the context data.
         /// </summary>
         /// <param name="contextData">The context data.</param>
         public virtual void LoadContext(T contextData)
         {
             this.ContextCache = contextData;
+        }
+
+        /// <summary>
+        /// Saves context to the storage.
+        /// </summary>
+        public virtual void SaveContext()
+        {
+            this.serializer.SaveContextData(this.ContextCache);
         }
 
         /// <summary>

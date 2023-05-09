@@ -7,6 +7,7 @@
     using System.Windows.Automation;
     using System.Windows.Forms;
     using ContextRecord.ContextDataStructures;
+    using ContextRecord.ContextSerializers;
     using ContextRecord.Win32ApiUtils;
 
     internal class EdgeBrowserContext : Context<IEnumerable<EdgeBrowserContextData>>
@@ -15,6 +16,11 @@
         /// The process name of Edge.
         /// </summary>
         private const string EdgeProcessName = "msedge";
+
+        public EdgeBrowserContext(IContextSerializer<IEnumerable<EdgeBrowserContextData>> serializer)
+            : base(serializer)
+        {
+        }
 
         /// <inheritdoc/>
         public override void RecoverContext()
