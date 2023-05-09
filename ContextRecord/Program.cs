@@ -8,9 +8,31 @@ namespace ContextRecord
     {
         static void Main(string[] args)
         {
-            var edgeBrowserContext = new EdgeBrowserContext();
-            var context = edgeBrowserContext.GetContext();
-            Console.WriteLine(string.Join(Environment.NewLine, context.Select(x => $"Title: {x.Title} URL: {x.URL}")));
+            if (args.Length == 2)
+            {
+                string type = args[0];
+                string description = args[1];
+                // Your code here
+
+                switch (type)
+                {
+                    //If the type is 'Record', print 'Recording the context...'
+                    case "Record":
+                        Console.WriteLine("Recording the context...");
+                        break;
+                    //If the type is 'Read', print 'Read the context...'
+                    case "Read":
+                        Console.WriteLine("Read the context...");
+                        break;
+                }
+
+                //Print the description
+                Console.WriteLine(description);
+            }
+            else
+            {
+                Console.WriteLine("Please provide two arguments: type and description.");
+            }
         }        
     }
 }
