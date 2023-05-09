@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.Runtime.InteropServices;
 
 namespace ContextRecord.Win32ApiUtils
@@ -8,6 +10,8 @@ namespace ContextRecord.Win32ApiUtils
     /// </summary>
     public static class User32
     {
+        delegate bool EnumThreadDelegate(IntPtr hWnd, IntPtr lParam);
+
         public static int ApiSetForegroundWindow(IntPtr point)
         {
             return SetForegroundWindow(point);
@@ -33,6 +37,22 @@ namespace ContextRecord.Win32ApiUtils
         [return: MarshalAs(UnmanagedType.Bool)]
         static extern bool GetWindowPlacement(IntPtr hWnd, ref WindowPlacement lpwndpl);
 
+        [DllImport("user32.dll")]
+        static extern bool EnumThreadWindows(int dwThreadId, EnumThreadDelegate lpfn, IntPtr lParam);
+
+        public static IEnumerable<IntPtr> EnumerateProcessWindowHandles(int processId)
+        {
+            var handles = new List<IntPtr>();
+            foreach (ProcessThread thread in Process.GetProcessById(processId).Threads)
+                EnumThreadWindows(thread.Id, (hWnd, lParam) =>
+                {
+                    handles.Add(hWnd);
+                    return true;
+                }, IntPtr.Zero);
+            return handles;
+        }
+
+
         public struct WindowPlacement
         {
             public int length;
@@ -42,5 +62,6 @@ namespace ContextRecord.Win32ApiUtils
             public System.Drawing.Point ptMaxPosition;
             public System.Drawing.Rectangle rcNormalPosition;
         }
+        
     }
 }
