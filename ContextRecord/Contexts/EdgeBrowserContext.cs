@@ -38,47 +38,56 @@
         protected override IEnumerable<EdgeBrowserContextData> GenerateNewContext()
         {
             /// TBD
-            return GetTabsAndURLs().Select(pair => new EdgeBrowserContextData() { Title = pair.Item1, URL = pair.Item2 }).ToList();
+            return GetTabsAndURLs().Select(pair => new EdgeBrowserContextData() { Title = pair.Item1, URL = pair.Item2,EdgeBrowserId = pair.Item3}).ToList();
         }
 
         /// <summary>
         /// Gets tab titles and URLs of Edge browser.
         /// </summary>
         /// <returns>A collection of tab titles and URLs.</returns>
-        private static IEnumerable<(string, string)> GetTabsAndURLs()
+        private static IEnumerable<(string, string,int)> GetTabsAndURLs()
         {
             var procsEdge = Process.GetProcessesByName(EdgeProcessName);
-
+            int edgeIndex = 0;
             foreach (var proc in procsEdge)
             {
                 var windowPlacement = new User32.WindowPlacement();
-                User32.ApiGetWindowPlacement(proc.MainWindowHandle, ref windowPlacement);
-
-                // Check if window is minimized
-                if (windowPlacement.showCmd == 2)
+                //Get the windows handle by the enum function in user32
+                //and iterate every handle to check if the windws placement is minimized
+                var handles = User32.EnumerateProcessWindowHandles(proc.Id);
+                foreach (var handle in handles)
                 {
-                    //the window is hidden so we restore it
-                    User32.ApiShowWindow(proc.MainWindowHandle.ToInt32(), 9);
-                }
-                //Switch Edge tab to the first one
-                User32.ApiSetForegroundWindow(proc.MainWindowHandle);
-                SendKeys.SendWait("^1");
-                if (proc.MainWindowHandle == IntPtr.Zero)
-                {
-                    continue;
-                }
-
-                var root = AutomationElement.FromHandle(proc.MainWindowHandle);
-                foreach (var tabItem in root.FindAll(TreeScope.Subtree, new PropertyCondition(AutomationElement.ControlTypeProperty, ControlType.TabItem)).Cast<AutomationElement>())
-                {
+                    User32.ApiGetWindowPlacement(handle, ref windowPlacement);
+                    if (windowPlacement.showCmd == 2)
+                    {
+                        //the window is hidden so we restore it
+                        User32.ApiShowWindow(handle.ToInt32(), 3);
+                    }
+                    //Switch Edge tab to the first one
+                    User32.ApiSetForegroundWindow(handle);
+                    SendKeys.SendWait("^1");
+                    if (handle == IntPtr.Zero)
+                    {
+                        continue;
+                    }
+                    
+                    var root = AutomationElement.FromHandle(handle);
                     var SearchBar = root.FindFirst(TreeScope.Descendants, new PropertyCondition(AutomationElement.NameProperty, "Address and search bar"));
 
-                    var title = tabItem.Current.Name;
-                    var url = (string)SearchBar.GetCurrentPropertyValue(ValuePatternIdentifiers.ValueProperty);
-                    yield return (title, url);
+                    if (SearchBar != null)
+                    {
+                        edgeIndex++;
+                    }
 
-                    User32.ApiSetForegroundWindow(proc.MainWindowHandle);
-                    SendKeys.SendWait("^{TAB}"); // change focus to next tab
+                    foreach (var tabItem in root.FindAll(TreeScope.Subtree, new PropertyCondition(AutomationElement.ControlTypeProperty, ControlType.TabItem)).Cast<AutomationElement>())
+                    {
+                        var title = tabItem.Current.Name;
+                        var url = (string)SearchBar.GetCurrentPropertyValue(ValuePatternIdentifiers.ValueProperty);
+                        yield return (title, url, edgeIndex);
+
+                        User32.ApiSetForegroundWindow(handle);
+                        SendKeys.SendWait("^{TAB}"); // change focus to next tab
+                    }
                 }
             }
         }

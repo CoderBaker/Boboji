@@ -24,5 +24,10 @@ namespace ContextRecord.ContextDataStructures
         /// The URL.
         /// </summary>
         public string URL { get; set; } = string.Empty;
+
+        /// <summary>
+        /// The edge browser id
+        /// </summary>
+        public int EdgeBrowserId { get; set; } = 0;
     }
 }
