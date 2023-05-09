@@ -1,4 +1,6 @@
-﻿namespace ContextRecord.ContextDataStructures
+﻿using System.Security.Cryptography.Xml;
+
+namespace ContextRecord.ContextDataStructures
 {
     using System.Text.Json.Serialization;
 
@@ -6,6 +8,12 @@
     /// The context data of edge browser.
     /// </summary>
     public record EdgeBrowserContextData
+    {
+        //The list that contains the web data.
+        public singleWebData[] WebDataList { get; set; } = new singleWebData[0];
+    }
+
+    public record singleWebData
     {
         /// <summary>
         /// The title.
