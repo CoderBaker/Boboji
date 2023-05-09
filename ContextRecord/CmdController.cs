@@ -73,15 +73,11 @@ namespace ContextRecord
 
             //Create a new Json file with name of filePath
             var file = System.IO.File.Create(filePath);
-
+            
         }
 
         private void ReadContext()
         {
-            //Create a new context
-            var context = new Context();
-            //Read the context
-            context.ReadContext();
         }
         
     }

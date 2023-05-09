@@ -7,6 +7,7 @@
     using System.Windows.Automation;
     using System.Windows.Forms;
     using ContextRecord.ContextDataStructures;
+    using ContextRecord.ContextSerializers;
     using ContextRecord.Win32ApiUtils;
 
     internal class EdgeBrowserContext : Context<IEnumerable<EdgeBrowserContextData>>
@@ -16,10 +17,21 @@
         /// </summary>
         private const string EdgeProcessName = "msedge";
 
+        public EdgeBrowserContext(IContextSerializer<IEnumerable<EdgeBrowserContextData>> serializer)
+            : base(serializer)
+        {
+        }
+
         /// <inheritdoc/>
         public override void RecoverContext()
         {
-            throw new NotImplementedException();
+            if (this.ContextCache != null)
+            {
+                foreach (var url in this.ContextCache.Select(x => x.URL))
+                {
+                    Process.Start(EdgeProcessName, url);
+                }
+            }
         }
 
         /// <inheritdoc/>
