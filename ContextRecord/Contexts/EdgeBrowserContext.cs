@@ -19,7 +19,13 @@
         /// <inheritdoc/>
         public override void RecoverContext()
         {
-            throw new NotImplementedException();
+            if (this.ContextCache != null)
+            {
+                foreach (var url in this.ContextCache.Select(x => x.URL))
+                {
+                    Process.Start(EdgeProcessName, url);
+                }
+            }
         }
 
         /// <inheritdoc/>
