@@ -44,6 +44,10 @@ namespace ContextRecord.Wpf
             EdgeBrowserContext edgeBrowserContext;
             OverallContext overallContext;
             string filePath = GetFilePath();
+            if (string.IsNullOrEmpty(filePath))
+            {
+                return;
+            }
 
             IContextSerializer<IEnumerable<EdgeBrowserContextData>> webContextSerializer = new JsonContextSerializer<IEnumerable<EdgeBrowserContextData>>(filePath + edgeExtName);
             IContextSerializer<OverallContextData> overallContextSerializer = new JsonContextSerializer<OverallContextData>(filePath + overallExtName);
@@ -63,12 +67,18 @@ namespace ContextRecord.Wpf
             {
                 //Ask user to input the file name and get the input
                 Console.WriteLine("Please input the Record name:");
-                var recordName = Console.ReadLine();
+                var recordNameInputWindow = new RecordNameInputWindow();
+                if (!(recordNameInputWindow.ShowDialog() ?? false))
+                {
+                    return string.Empty;
+                }
+
+                var recordName = recordNameInputWindow.RecordName;
 
                 //Check the fileName is empty
                 if (string.IsNullOrEmpty(recordName))
                 {
-                    Console.WriteLine("Error: The Record name can not be empty!");
+                    MessageBox.Show("Error: The Record name can not be empty!", "Context Record", MessageBoxButton.OK, MessageBoxImage.Error);
                     continue;
                 }
 
@@ -76,7 +86,7 @@ namespace ContextRecord.Wpf
                 //Check the file is exist
                 if (System.IO.File.Exists(filePath + overallExtName))
                 {
-                    Console.WriteLine("Error: Record with this name is exist! Please choose another name:");
+                    MessageBox.Show("Error: Record with this name exists! Please choose another name.", "Context Record", MessageBoxButton.OK, MessageBoxImage.Error);
                     continue;
                 }
 
