@@ -11,34 +11,39 @@ namespace ContextRecord
 {
     internal class CmdController
     {
-        private EdgeBrowserContext edgeBrowserContext;
-        private OverallContext overallContext;
-
         private const string edgeExtName = "_web";
         private const string overallExtName = "_overall";
+        private const string recordFolder = "Record/";
 
         /// <summary>
         /// Start the process
         /// </summary>
         public void StartProcess()
         {
-            ///Ask user to choose
-            Console.WriteLine("Please choose by input the number:");
-            Console.WriteLine("1: Record the context");
-            Console.WriteLine("2: Read the record");
-
-            //Get the input
-            var input = Console.ReadLine();
-            switch (input)
+            while (true)
             {
-                //input = 1, record the context
-                case "1":
-                    RecordContext();
-                    break;
-                //input = 2, read the record
-                case "2":
-                    ReadContext();
-                    break;
+                ///Ask user to choose
+                Console.WriteLine("*********************************************");
+                Console.WriteLine("Please choose by input the number:");
+                Console.WriteLine("1: Record the context");
+                Console.WriteLine("2: Read the record");
+                Console.WriteLine("*********************************************");
+                //Get the input
+                var input = Console.ReadLine();
+                switch (input)
+                {
+                    //input = 1, record the context
+                    case "1":
+                        RecordContext();
+                        break;
+                    //input = 2, read the record
+                    case "2":
+                        ReadContext();
+                        break;
+                    //input = 0, exit the process
+                    case "0":
+                        return;
+                }
             }
         }
 
@@ -47,17 +52,19 @@ namespace ContextRecord
         /// </summary>
         private void RecordContext()
         {
+            EdgeBrowserContext edgeBrowserContext;
+            OverallContext overallContext;
             string filePath = this.getFilePath();
 
             IContextSerializer<IEnumerable<EdgeBrowserContextData>> webContextSerializer = new JsonContextSerializer<IEnumerable<EdgeBrowserContextData>>(filePath + edgeExtName);
             IContextSerializer<OverallContextData> overallContextSerializer = new JsonContextSerializer<OverallContextData>(filePath + overallExtName);
-            this.overallContext = new OverallContext(overallContextSerializer);
-            this.edgeBrowserContext = new EdgeBrowserContext(webContextSerializer);
+            overallContext = new OverallContext(overallContextSerializer);
+            edgeBrowserContext = new EdgeBrowserContext(webContextSerializer);
 
-            this.overallContext.GetContext();
-            this.overallContext.SaveContext();
-            this.edgeBrowserContext.GetContext();
-            this.edgeBrowserContext.SaveContext();
+            overallContext.GetContext();
+            overallContext.SaveContext();
+            edgeBrowserContext.GetContext();
+            edgeBrowserContext.SaveContext();
             
         }
 
@@ -78,7 +85,7 @@ namespace ContextRecord
 
                 var filePath = "Record/" + recordName;
                 //Check the file is exist
-                if (System.IO.File.Exists(filePath + overallContext))
+                if (System.IO.File.Exists(filePath + overallExtName))
                 {
                     Console.WriteLine("Error: Record with this name is exist! Please choose another name:");
                     continue;
@@ -88,8 +95,61 @@ namespace ContextRecord
             }
         }
 
+        /// <summary>
+        /// Read the context from a json file
+        /// </summary>
         private void ReadContext()
         {
+            OverallContext overallContext;
+            EdgeBrowserContext edgeBrowserContext;
+
+            //Scan the record folder and store the file name end with _overview into a list
+            string[] files = System.IO.Directory.GetFiles("Record/", "*_overall");
+
+            //Display the file name in the list and cut the _overall, and display the time and description in record
+            for (int i = 0; i < files.Length; i++)
+            {
+                //Get the file name
+                string curFileName = System.IO.Path.GetFileName(files[i]);
+                //Cut the _overall
+                string curRecordName = curFileName.Substring(0, curFileName.Length - 8);
+                //Get the time and description
+                IContextSerializer<OverallContextData> overallContextSerializer = new JsonContextSerializer<OverallContextData>(recordFolder + curFileName);
+                overallContext = new OverallContext(overallContextSerializer);
+                OverallContextData overallContextData = overallContext.GetOverallContextData();
+                Console.WriteLine(i + ":   " + curRecordName + " --- " + overallContextData.Time + " --- " + overallContextData.Description);
+            }
+
+            int input = GetUserInputNum(files.Length);
+            string fileName = System.IO.Path.GetFileName(files[input]);
+            string recordName = fileName.Substring(0, fileName.Length - 8);
+
+            IContextSerializer<IEnumerable<EdgeBrowserContextData>> webContextSerializer = new JsonContextSerializer<IEnumerable<EdgeBrowserContextData>>(recordFolder + recordName + edgeExtName);
+            edgeBrowserContext = new EdgeBrowserContext(webContextSerializer);
+            edgeBrowserContext.RecoverContext();
+        }
+
+        /// <summary>
+        /// Get the user input number
+        /// </summary>
+        /// <param name="maxLength">File length</param>
+        /// <returns>The input number</returns>
+        private int GetUserInputNum(int maxLength)
+        {
+            while (true)
+            {
+                //Ask user to choose the record
+                Console.WriteLine("Please choose the record by input the number:");
+                var input = int.Parse(Console.ReadLine());
+                //check the input is not larger than the list
+                if (input >= maxLength || input < 0)
+                {
+                    Console.WriteLine("Error: The input is not valid!");
+                    continue;
+                }
+
+                return input;
+            }
         }
 
     }

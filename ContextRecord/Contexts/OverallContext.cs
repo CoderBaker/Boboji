@@ -16,6 +16,12 @@ namespace ContextRecord.Contexts
         {
         }
 
+        public OverallContextData GetOverallContextData()
+        {
+            this.LoadContext();
+            return this.ContextCache;
+        }
+
         /// <summary>
         /// Generates a new context.
         /// </summary>

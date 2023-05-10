@@ -25,11 +25,13 @@
         /// <inheritdoc/>
         public override void RecoverContext()
         {
+            this.LoadContext();
             if (this.ContextCache != null)
             {
                 foreach (var url in this.ContextCache.Select(x => x.URL))
                 {
-                    Process.Start(EdgeProcessName, url);
+                    //Open the URL in Edge through the command line
+                    Process.Start("msedge.exe", url);
                 }
             }
         }
