@@ -6,12 +6,11 @@
     using System.Linq;
     using System.Windows.Automation;
     using System.Windows.Forms;
-    using System.Windows.Markup;
     using ContextRecord.ContextDataStructures;
     using ContextRecord.ContextSerializers;
     using ContextRecord.Win32ApiUtils;
 
-    internal class EdgeBrowserContext : Context<IEnumerable<EdgeBrowserContextData>>
+    public class EdgeBrowserContext : Context<IEnumerable<EdgeBrowserContextData>>
     {
         /// <summary>
         /// The process name of Edge.
