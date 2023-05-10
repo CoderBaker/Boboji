@@ -24,6 +24,11 @@ namespace ContextRecord.ContextSerializers
 
         public void SaveContextData(T? contextData)
         {
+            //Check if the file path exists
+            if (!Directory.Exists(Path.GetDirectoryName(path)))
+            {
+                Directory.CreateDirectory(Path.GetDirectoryName(path));
+            }
             File.WriteAllText(path, JsonConvert.SerializeObject(contextData));
         }
     }
