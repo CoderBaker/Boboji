@@ -28,10 +28,26 @@
             this.LoadContext();
             if (this.ContextCache != null)
             {
-                foreach (var url in this.ContextCache.Select(x => x.URL))
+                //aggregate the urls from the context according to the edge browser id and iterate the urls according to the edge browser id
+                var edgeBrowserIds = this.ContextCache.Select(data => data.EdgeBrowserId).Distinct();
+
+                //Iterate the edge browser ids and select the urls according to the edge browser id
+                foreach (var edgeBrowserId in edgeBrowserIds)
                 {
-                    //Open the URL in Edge through the command line
-                    Process.Start("msedge.exe", url);
+                    var urls = this.ContextCache.Where(data => data.EdgeBrowserId == edgeBrowserId).Select(data => data.URL);
+                    // start a command line and run the command to open the edge browser
+                    var command = $"start msedge {string.Join(",", urls)}";
+                    var process = new Process
+                    {
+                        StartInfo = new ProcessStartInfo
+                        {
+                            FileName = "cmd.exe",
+                            Arguments = $"/c {command}",
+                            UseShellExecute = false,
+                            CreateNoWindow = true,
+                        },
+                    };
+                    process.Start();
                 }
             }
         }
@@ -39,7 +55,6 @@
         /// <inheritdoc/>
         protected override IEnumerable<EdgeBrowserContextData> GenerateNewContext()
         {
-            /// TBD
             return GetTabsAndURLs().Select(pair => new EdgeBrowserContextData() { Title = pair.Item1, URL = pair.Item2,EdgeBrowserId = pair.Item3}).ToList();
         }
 
@@ -76,10 +91,12 @@
                     var root = AutomationElement.FromHandle(handle);
                     var SearchBar = root.FindFirst(TreeScope.Descendants, new PropertyCondition(AutomationElement.NameProperty, "Address and search bar"));
 
-                    if (SearchBar != null)
+                    if (SearchBar == null)
                     {
-                        edgeIndex++;
+                        continue;
                     }
+
+                    edgeIndex++;
 
                     foreach (var tabItem in root.FindAll(TreeScope.Subtree, new PropertyCondition(AutomationElement.ControlTypeProperty, ControlType.TabItem)).Cast<AutomationElement>())
                     {
