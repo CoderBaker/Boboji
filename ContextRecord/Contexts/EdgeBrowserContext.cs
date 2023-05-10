@@ -6,6 +6,7 @@
     using System.Linq;
     using System.Windows.Automation;
     using System.Windows.Forms;
+    using System.Windows.Markup;
     using ContextRecord.ContextDataStructures;
     using ContextRecord.ContextSerializers;
     using ContextRecord.Win32ApiUtils;
@@ -34,9 +35,11 @@
                 //Iterate the edge browser ids and select the urls according to the edge browser id
                 foreach (var edgeBrowserId in edgeBrowserIds)
                 {
-                    var urls = this.ContextCache.Where(data => data.EdgeBrowserId == edgeBrowserId).Select(data => data.URL);
+                    //add the string symbol at the beginning and end of the url and add signle when select url from context
+                    var urls = this.ContextCache.Where(data => data.EdgeBrowserId == edgeBrowserId).Select(data => $"\"{data.URL}\"").ToList();
                     // start a command line and run the command to open the edge browser
-                    var command = $"start msedge {string.Join(",", urls)}";
+                    // the command show open a brand new edge browser each time open the urls
+                    var command = $"start msedge /new-window {string.Join(" ", urls)}";
                     var process = new Process
                     {
                         StartInfo = new ProcessStartInfo
@@ -75,6 +78,12 @@
                 foreach (var handle in handles)
                 {
                     User32.ApiGetWindowPlacement(handle, ref windowPlacement);
+
+                    if (windowPlacement.showCmd < 2)
+                    {
+                        continue;
+                    }
+
                     if (windowPlacement.showCmd == 2)
                     {
                         //the window is hidden so we restore it
@@ -98,13 +107,14 @@
 
                     edgeIndex++;
 
-                    foreach (var tabItem in root.FindAll(TreeScope.Subtree, new PropertyCondition(AutomationElement.ControlTypeProperty, ControlType.TabItem)).Cast<AutomationElement>())
+                    //find the tab item according to the control type in the root element and iterate every tab item to get the title and url
+                    var tabBar = root.FindFirst(TreeScope.Subtree, new PropertyCondition(AutomationElement.ControlTypeProperty, ControlType.Tab));
+                    var tabItems = tabBar.FindAll(TreeScope.Descendants, new PropertyCondition(AutomationElement.ControlTypeProperty, ControlType.TabItem));
+                    foreach (AutomationElement tabItem in tabItems)
                     {
-                        var title = tabItem.Current.Name;
-                        var url = (string)SearchBar.GetCurrentPropertyValue(ValuePatternIdentifiers.ValueProperty);
-                        yield return (title, url, edgeIndex);
-
-                        User32.ApiSetForegroundWindow(handle);
+                        var tabTitle = tabItem.Current.Name;
+                        var tabURL = (string)SearchBar.GetCurrentPropertyValue(ValuePatternIdentifiers.ValueProperty);
+                        yield return (tabTitle, tabURL,edgeIndex);
                         SendKeys.SendWait("^{TAB}"); // change focus to next tab
                     }
                 }

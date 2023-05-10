@@ -43,7 +43,7 @@ namespace ContextRecord.Win32ApiUtils
         public static IEnumerable<IntPtr> EnumerateProcessWindowHandles(int processId)
         {
             var handles = new List<IntPtr>();
-            foreach (ProcessThread thread in Process.GetProcessById(processId).Threads)
+            foreach (ProcessThread thread in Process.GetProcessById(processId)?.Threads)
                 EnumThreadWindows(thread.Id, (hWnd, lParam) =>
                 {
                     handles.Add(hWnd);
