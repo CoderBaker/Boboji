@@ -27,6 +27,7 @@ namespace ContextRecord
                 Console.WriteLine("Please choose by input the number:");
                 Console.WriteLine("1: Record the context");
                 Console.WriteLine("2: Read the record");
+                Console.WriteLine("3: Delete a record");
                 Console.WriteLine("*********************************************");
                 //Get the input
                 var input = Console.ReadLine();
@@ -34,16 +35,23 @@ namespace ContextRecord
                 {
                     //input = 1, record the context
                     case "1":
-                        RecordContext();
+                        this.RecordContext();
                         break;
                     //input = 2, read the record
                     case "2":
-                        ReadContext();
+                        this.ReadContext();
+                        break;
+                    //input = 3, delete a record
+                    case "3":
+                        this.DeleteContext();
                         break;
                     //input = 0, exit the process
                     case "0":
                         return;
                 }
+
+                //refresh the window
+                Console.Clear();
             }
         }
 
@@ -100,29 +108,9 @@ namespace ContextRecord
         /// </summary>
         private void ReadContext()
         {
-            OverallContext overallContext;
             EdgeBrowserContext edgeBrowserContext;
 
-            //Scan the record folder and store the file name end with _overview into a list
-            string[] files = System.IO.Directory.GetFiles("Record/", "*_overall");
-
-            //Display the file name in the list and cut the _overall, and display the time and description in record
-            for (int i = 0; i < files.Length; i++)
-            {
-                //Get the file name
-                string curFileName = System.IO.Path.GetFileName(files[i]);
-                //Cut the _overall
-                string curRecordName = curFileName.Substring(0, curFileName.Length - 8);
-                //Get the time and description
-                IContextSerializer<OverallContextData> overallContextSerializer = new JsonContextSerializer<OverallContextData>(recordFolder + curFileName);
-                overallContext = new OverallContext(overallContextSerializer);
-                OverallContextData overallContextData = overallContext.GetOverallContextData();
-                Console.WriteLine(i + ":   " + curRecordName + " --- " + overallContextData.Time + " --- " + overallContextData.Description);
-            }
-
-            int input = GetUserInputNum(files.Length);
-            string fileName = System.IO.Path.GetFileName(files[input]);
-            string recordName = fileName.Substring(0, fileName.Length - 8);
+            string recordName = this.displayAndChooseRecord();
 
             IContextSerializer<IEnumerable<EdgeBrowserContextData>> webContextSerializer = new JsonContextSerializer<IEnumerable<EdgeBrowserContextData>>(recordFolder + recordName + edgeExtName);
             edgeBrowserContext = new EdgeBrowserContext(webContextSerializer);
@@ -151,6 +139,41 @@ namespace ContextRecord
                 return input;
             }
         }
+
+        private void DeleteContext()
+        {
+            string recordName = this.displayAndChooseRecord();
+            System.IO.File.Delete(recordFolder + recordName + edgeExtName);
+            System.IO.File.Delete(recordFolder + recordName + overallExtName);
+        }
+
+        private string displayAndChooseRecord()
+        {
+            OverallContext overallContext;
+            //Scan the record folder and store the file name end with _overview into a list
+            string[] files = System.IO.Directory.GetFiles("Record/", "*_overall");
+
+            //Display the file name in the list and cut the _overall, and display the time and description in record
+            for (int i = 0; i < files.Length; i++)
+            {
+                //Get the file name
+                string curFileName = System.IO.Path.GetFileName(files[i]);
+                //Cut the _overall
+                string curRecordName = curFileName.Substring(0, curFileName.Length - 8);
+                //Get the time and description
+                IContextSerializer<OverallContextData> overallContextSerializer = new JsonContextSerializer<OverallContextData>(recordFolder + curFileName);
+                overallContext = new OverallContext(overallContextSerializer);
+                OverallContextData overallContextData = overallContext.GetOverallContextData();
+                Console.WriteLine(i + ":   " + curRecordName + " --- " + overallContextData.Time + " --- " + overallContextData.Description);
+            }
+
+            int input = GetUserInputNum(files.Length);
+            string fileName = System.IO.Path.GetFileName(files[input]);
+            string recordName = fileName.Substring(0, fileName.Length - 8);
+
+            return recordName;
+        }
+
 
     }
 }
