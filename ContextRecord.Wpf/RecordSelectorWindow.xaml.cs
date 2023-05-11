@@ -4,14 +4,14 @@ using ContextRecord.Wpf.ViewModels;
 namespace ContextRecord.Wpf
 {
     /// <summary>
-    /// Interaction logic for RecordNameInputWindow.xaml
+    /// Interaction logic for RecordSelectorWindow.xaml
     /// </summary>
-    public partial class RecordNameInputWindow : Window
+    public partial class RecordSelectorWindow : Window
     {
-        public RecordNameInputWindow()
+        public RecordSelectorWindow()
         {
             InitializeComponent();
-            DataContext = new RecordNameInputViewModel();
+            DataContext = new RecordSelectorViewModel();
         }
 
         private void ButtonOK_Click(object sender, RoutedEventArgs e)

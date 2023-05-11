@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Windows;
 using ContextRecord.ContextDataStructures;
 using ContextRecord.Contexts;
 using ContextRecord.ContextSerializers;
+using ContextRecord.Wpf.DataStructures;
+using ContextRecord.Wpf.ViewModels;
 
 namespace ContextRecord.Wpf
 {
@@ -73,7 +76,7 @@ namespace ContextRecord.Wpf
                     return string.Empty;
                 }
 
-                var recordName = recordNameInputWindow.RecordName;
+                var recordName = ((RecordNameInputViewModel)recordNameInputWindow.DataContext).RecordName;
 
                 //Check the fileName is empty
                 if (string.IsNullOrEmpty(recordName))
@@ -95,13 +98,17 @@ namespace ContextRecord.Wpf
         }
 
         /// <summary>
-        /// Read the context from a json file
+        /// Read the context from a JSON file.
         /// </summary>
         private static void ReadContext()
         {
             EdgeBrowserContext edgeBrowserContext;
 
-            string recordName = DisplayAndChooseRecord();
+            var recordName = DisplayAndChooseRecord();
+            if (string.IsNullOrEmpty(recordName))
+            {
+                return;
+            }
 
             IContextSerializer<IEnumerable<EdgeBrowserContextData>> webContextSerializer = new JsonContextSerializer<IEnumerable<EdgeBrowserContextData>>(recordFolder + recordName + edgeExtName);
             edgeBrowserContext = new EdgeBrowserContext(webContextSerializer);
@@ -109,58 +116,77 @@ namespace ContextRecord.Wpf
         }
 
         /// <summary>
-        /// Get the user input number
+        /// Get the user input for records.
         /// </summary>
-        /// <param name="maxLength">File length</param>
-        /// <returns>The input number</returns>
-        private static int GetUserInputNum(int maxLength)
+        /// <param name="records">Records.</param>
+        /// <returns>The record chosen.</returns>
+        private static Record? GetUserInput(IEnumerable<Record> records)
         {
             while (true)
             {
                 //Ask user to choose the record
-                Console.WriteLine("Please choose the record by input the number:");
-                var input = int.Parse(Console.ReadLine());
-                //check the input is not larger than the list
-                if (input >= maxLength || input < 0)
+                var dialog = new RecordSelectorWindow();
+                ((RecordSelectorViewModel)dialog.DataContext).Records.Clear();
+                foreach (var record in records)
                 {
-                    Console.WriteLine("Error: The input is not valid!");
-                    continue;
+                    ((RecordSelectorViewModel)dialog.DataContext).Records.Add(record);
                 }
 
-                return input;
+                var result = dialog.ShowDialog() ?? false;
+                if (!result)
+                {
+                    return null;
+                }
+
+                return ((RecordSelectorViewModel)dialog.DataContext).SelectedItem;
             }
         }
 
         private static void DeleteContext()
         {
-            string recordName = DisplayAndChooseRecord();
+            var recordName = DisplayAndChooseRecord();
+            if(string.IsNullOrEmpty(recordName))
+            {
+                return;
+            }
+
             System.IO.File.Delete(recordFolder + recordName + edgeExtName);
             System.IO.File.Delete(recordFolder + recordName + overallExtName);
         }
 
-        private static string DisplayAndChooseRecord()
+        private static string? DisplayAndChooseRecord()
         {
             OverallContext overallContext;
             //Scan the record folder and store the file name end with _overview into a list
             string[] files = System.IO.Directory.GetFiles("Record/", "*_overall");
 
             //Display the file name in the list and cut the _overall, and display the time and description in record
-            for (int i = 0; i < files.Length; i++)
+            var records = files.Select(x =>
             {
                 //Get the file name
-                string curFileName = System.IO.Path.GetFileName(files[i]);
+                string curFileName = System.IO.Path.GetFileName(x);
                 //Cut the _overall
-                string curRecordName = curFileName.Substring(0, curFileName.Length - 8);
+                string curRecordName = curFileName[..^8];
                 //Get the time and description
                 IContextSerializer<OverallContextData> overallContextSerializer = new JsonContextSerializer<OverallContextData>(recordFolder + curFileName);
                 overallContext = new OverallContext(overallContextSerializer);
                 OverallContextData overallContextData = overallContext.GetOverallContextData();
-                Console.WriteLine(i + ":   " + curRecordName + " --- " + overallContextData.Time + " --- " + overallContextData.Description);
+                return new Record()
+                {
+                    Name = curRecordName,
+                    Time = overallContextData.Time,
+                    Description = overallContextData.Description,
+                };
+            }).ToList();
+
+            var input = GetUserInput(records);
+            if (input == null)
+            {
+                return null;
             }
 
-            int input = GetUserInputNum(files.Length);
-            string fileName = System.IO.Path.GetFileName(files[input]);
-            string recordName = fileName.Substring(0, fileName.Length - 8);
+            string fileName = System.IO.Path.GetFileName(input.Name);
+            string recordName = fileName[..^8];
 
             return recordName;
         }

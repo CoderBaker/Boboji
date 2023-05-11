@@ -1,4 +1,4 @@
-﻿<Window x:Class="ContextRecord.Wpf.RecordNameInputWindow"
+﻿<Window x:Class="ContextRecord.Wpf.RecordSelectorWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -6,11 +6,11 @@
         xmlns:local="clr-namespace:ContextRecord.Wpf"
         xmlns:vm="clr-namespace:ContextRecord.Wpf.ViewModels"
         mc:Ignorable="d"
-        Title="Input record name" Height="100" Width="300" ResizeMode="NoResize"
-        d:DataContext="{d:DesignInstance Type=vm:RecordNameInputViewModel}">
+        Title="RecordSelectorWindow" Height="100" Width="400"
+        d:DataContext="{d:DesignInstance Type=vm:RecordSelectorViewModel}">
     <StackPanel Margin="5,5,5,5">
-        <Label Content="Please input the Record name:" Target="{Binding RecordName, Mode=TwoWay}" />
-        <TextBox x:Name="TextBoxInput" Margin="5,0,0,0" />
+        <Label Content="Please choose the record" Target="{Binding ElementName=RecordsComboBox}" />
+        <ComboBox x:Name="RecordsComboBox" ItemsSource="{Binding Records}" SelectedItem="{Binding SelectedItem, Mode=TwoWay}" />
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,5,0,0">
             <Button x:Name="ButtonOK" Content="OK" Width="50" IsDefault="True" Margin="0,0,5,0" Click="ButtonOK_Click" />
             <Button x:Name="ButtonCancel" Content="Cancel" Width="50" IsCancel="True" Click="ButtonCancel_Click" />
