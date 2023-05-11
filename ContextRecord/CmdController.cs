@@ -91,7 +91,7 @@ namespace ContextRecord
                     continue;
                 }
 
-                var filePath = "Record/" + recordName;
+                var filePath = recordFolder + recordName;
                 //Check the file is exist
                 if (System.IO.File.Exists(filePath + overallExtName))
                 {
