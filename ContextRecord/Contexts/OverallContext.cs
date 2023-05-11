@@ -4,7 +4,7 @@ using System;
 
 namespace ContextRecord.Contexts
 {
-    internal class OverallContext : Context<OverallContextData>
+    public class OverallContext : Context<OverallContextData>
     {
         public OverallContext(IContextSerializer<OverallContextData> serializer)
             : base(serializer)

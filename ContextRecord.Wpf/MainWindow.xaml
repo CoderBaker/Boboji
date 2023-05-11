@@ -1,0 +1,24 @@
+﻿<Window x:Class="ContextRecord.Wpf.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:ContextRecord.Wpf"
+        mc:Ignorable="d"
+        Title="Context Record" Height="150" Width="300" ResizeMode="CanMinimize">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <Grid.Resources>
+            <Style TargetType="{x:Type Button}">
+                <Setter Property="Margin" Value="5,5,5,5" />
+            </Style>
+        </Grid.Resources>
+        <Button x:Name="ButtonSaveContext" Content="Record the context" Grid.Row="0" Click="ButtonSaveContext_Click" />
+        <Button x:Name="ButtonLoadRecord" Content="Read the record" Grid.Row="1" Click="ButtonLoadRecord_Click" />
+        <Button x:Name="ButtonDeleteRecord" Content="Delete a record" Grid.Row="2" Click="ButtonDeleteRecord_Click" />
+    </Grid>
+</Window>
