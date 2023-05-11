@@ -6,11 +6,11 @@
         xmlns:local="clr-namespace:ContextRecord.Wpf"
         xmlns:vm="clr-namespace:ContextRecord.Wpf.ViewModels"
         mc:Ignorable="d"
-        Title="Input record name" Height="100" Width="300" ResizeMode="NoResize"
+        Title="Input record name" Height="120" Width="300" ResizeMode="NoResize"
         d:DataContext="{d:DesignInstance Type=vm:RecordNameInputViewModel}">
     <StackPanel Margin="5,5,5,5">
-        <Label Content="Please input the Record name:" Target="{Binding RecordName, Mode=TwoWay}" />
-        <TextBox x:Name="TextBoxInput" Margin="5,0,0,0" />
+        <Label Content="Please input the Record name:" Target="{Binding ElementName=TextBoxInput}" />
+        <TextBox x:Name="TextBoxInput" Margin="5,0,0,0" Text="{Binding RecordName, Mode=TwoWay}" />
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,5,0,0">
             <Button x:Name="ButtonOK" Content="OK" Width="50" IsDefault="True" Margin="0,0,5,0" Click="ButtonOK_Click" />
             <Button x:Name="ButtonCancel" Content="Cancel" Width="50" IsCancel="True" Click="ButtonCancel_Click" />

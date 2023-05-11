@@ -2,6 +2,6 @@
 {
     public class RecordNameInputViewModel
     {
-        public string RecordName { get; private set; } = string.Empty;
+        public string RecordName { get; set; } = string.Empty;
     }
 }

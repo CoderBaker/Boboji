@@ -174,6 +174,7 @@ namespace ContextRecord.Wpf
                 return new Record()
                 {
                     Name = curRecordName,
+                    Path = x,
                     Time = overallContextData.Time,
                     Description = overallContextData.Description,
                 };
@@ -185,7 +186,7 @@ namespace ContextRecord.Wpf
                 return null;
             }
 
-            string fileName = System.IO.Path.GetFileName(input.Name);
+            string fileName = System.IO.Path.GetFileName(input.Path);
             string recordName = fileName[..^8];
 
             return recordName;
