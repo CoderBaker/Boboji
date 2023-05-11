@@ -13,6 +13,7 @@ namespace ContextRecord
     {
         private const string edgeExtName = "_web";
         private const string overallExtName = "_overall";
+        private const string docExtName = "_doc";
         private const string recordFolder = "Record/";
 
         /// <summary>
@@ -62,17 +63,22 @@ namespace ContextRecord
         {
             EdgeBrowserContext edgeBrowserContext;
             OverallContext overallContext;
+            DocContext docContext;
             string filePath = this.getFilePath();
 
             IContextSerializer<IEnumerable<EdgeBrowserContextData>> webContextSerializer = new JsonContextSerializer<IEnumerable<EdgeBrowserContextData>>(filePath + edgeExtName);
             IContextSerializer<OverallContextData> overallContextSerializer = new JsonContextSerializer<OverallContextData>(filePath + overallExtName);
+            IContextSerializer<IEnumerable<DocContextData>> docContextSerializer = new JsonContextSerializer<IEnumerable<DocContextData>>(filePath + docExtName);
             overallContext = new OverallContext(overallContextSerializer);
             edgeBrowserContext = new EdgeBrowserContext(webContextSerializer);
+            docContext = new DocContext(docContextSerializer);
 
             overallContext.GetContext();
             overallContext.SaveContext();
             edgeBrowserContext.GetContext();
             edgeBrowserContext.SaveContext();
+
+            docContext.writeContextByExe(filePath);
             
         }
 
@@ -109,12 +115,17 @@ namespace ContextRecord
         private void ReadContext()
         {
             EdgeBrowserContext edgeBrowserContext;
+            DocContext docContext;
 
             string recordName = this.displayAndChooseRecord();
 
             IContextSerializer<IEnumerable<EdgeBrowserContextData>> webContextSerializer = new JsonContextSerializer<IEnumerable<EdgeBrowserContextData>>(recordFolder + recordName + edgeExtName);
+            IContextSerializer<IEnumerable<DocContextData>> docContextSerializer = new JsonContextSerializer<IEnumerable<DocContextData>>(recordFolder + recordName + docExtName);
+
             edgeBrowserContext = new EdgeBrowserContext(webContextSerializer);
+            docContext = new DocContext(docContextSerializer);
             edgeBrowserContext.RecoverContext();
+            docContext.RecoverContext();
         }
 
         /// <summary>
