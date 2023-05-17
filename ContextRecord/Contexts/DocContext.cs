@@ -12,7 +12,7 @@ using static System.Windows.Forms.AxHost;
 
 namespace ContextRecord.Contexts
 {
-    internal class DocContext: Context<IEnumerable<DocContextData>>
+    public class DocContext: Context<IEnumerable<DocContextData>>
     {
         public DocContext(IContextSerializer<IEnumerable<DocContextData>> serializer)
             : base(serializer)

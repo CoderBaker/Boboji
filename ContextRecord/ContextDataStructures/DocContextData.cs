@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ContextRecord.ContextDataStructures
 {
-    internal record DocContextData
+    public record DocContextData
     {
         /// <summary>
         /// The title.
